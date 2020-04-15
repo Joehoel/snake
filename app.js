@@ -2,7 +2,7 @@ const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 
 const ctx = canvas.getContext("2d");
-const scale = 20;
+const scale = 30;
 
 class Grid {
   get rows() {
