@@ -2,7 +2,13 @@ const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 
 const ctx = canvas.getContext("2d");
-const scale = 30;
+
+const size = 600;
+const framerate = 10;
+const scale = 40;
+
+canvas.width = size;
+canvas.height = size;
 
 class Grid {
   get rows() {
@@ -121,6 +127,10 @@ const grid = new Grid();
 fruit.new();
 
 setInterval(() => {
+  requestAnimationFrame(game);
+}, 1000 / framerate);
+
+function game() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   fruit.draw();
   snake.update();
@@ -132,7 +142,7 @@ setInterval(() => {
   if (snake.eat(fruit)) {
     fruit.new();
   }
-}, 200);
+}
 
 window.addEventListener("keydown", (e) => {
   const direction = e.key.replace("Arrow", "").toLowerCase();
