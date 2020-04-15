@@ -1,4 +1,6 @@
 const canvas = document.querySelector("canvas");
+const score = document.querySelector(".score");
+
 const ctx = canvas.getContext("2d");
 const scale = 20;
 
@@ -61,6 +63,15 @@ class Snake {
     return false;
   }
 
+  check() {
+    for (let i = 0; i < this.tail.length; i++) {
+      if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
+        this.total = 0;
+        this.tail = [];
+      }
+    }
+  }
+
   steer(direction) {
     switch (direction) {
       case "up":
@@ -114,6 +125,9 @@ setInterval(() => {
   fruit.draw();
   snake.update();
   snake.draw();
+  snake.check();
+
+  score.textContent = snake.total;
 
   if (snake.eat(fruit)) {
     fruit.new();
