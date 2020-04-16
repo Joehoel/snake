@@ -1,6 +1,7 @@
 const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 const highscore = document.querySelector(".highscore");
+const message = document.querySelector("#start");
 
 const ctx = canvas.getContext("2d");
 
@@ -22,8 +23,8 @@ class Grid {
 
 class Snake {
   constructor() {
-    this.x = 0;
-    this.y = 0;
+    this.x = (Math.floor(Math.random() * grid.rows - 1) + 1) * scale;
+    this.y = (Math.floor(Math.random() * grid.columns - 1) + 1) * scale;
 
     this.xs = scale * 1;
     this.ys = 0;
@@ -73,9 +74,12 @@ class Snake {
   check() {
     for (let i = 0; i < this.tail.length; i++) {
       if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
-        Storage.setHighscore(this.total.toString());
+        Storage.setHighscore(this.total);
         this.total = 0;
         this.tail = [];
+        clearInterval(loop);
+        started = false;
+        message.textContent = "You died, press any key to try again...";
       }
     }
   }
@@ -141,15 +145,20 @@ class Storage {
   }
 }
 
-const snake = new Snake();
-const fruit = new Fruit();
 const grid = new Grid();
+const fruit = new Fruit();
+const snake = new Snake();
 
 fruit.new();
+fruit.draw();
+snake.draw();
 
-setInterval(() => {
-  requestAnimationFrame(game);
-}, 1000 / framerate);
+let loop;
+function start() {
+  loop = setInterval(() => {
+    requestAnimationFrame(game);
+  }, 1000 / framerate);
+}
 
 function game() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -170,7 +179,16 @@ function game() {
   }
 }
 
+let started = false;
+
+highscore.textContent = Storage.getHighscore();
+
 window.addEventListener("keydown", (e) => {
+  if (!started) {
+    message.textContent = "";
+    start();
+    started = true;
+  }
   const direction = e.key.replace("Arrow", "").toLowerCase();
   snake.steer(direction);
 });
