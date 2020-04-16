@@ -135,7 +135,9 @@ class Storage {
   }
 
   static setHighscore(score) {
-    localStorage.setItem("highscore", score);
+    if (score > this.getHighscore()) {
+      localStorage.setItem("highscore", score);
+    }
   }
 }
 
