@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
+const highscore = document.querySelector(".highscore");
 
 const ctx = canvas.getContext("2d");
 
@@ -49,11 +50,11 @@ class Snake {
     this.x += this.xs;
     this.y += this.ys;
 
-    if (this.x > canvas.width) {
+    if (this.x >= canvas.width) {
       this.x = 0;
     } else if (this.x < 0) {
       this.x = canvas.width;
-    } else if (this.y > canvas.height) {
+    } else if (this.y >= canvas.height) {
       this.y = 0;
     } else if (this.y < 0) {
       this.y = canvas.height;
@@ -72,6 +73,7 @@ class Snake {
   check() {
     for (let i = 0; i < this.tail.length; i++) {
       if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
+        Storage.setHighscore(this.total.toString());
         this.total = 0;
         this.tail = [];
       }
@@ -120,6 +122,23 @@ class Fruit {
   }
 }
 
+class Storage {
+  static getHighscore() {
+    let highscore;
+
+    if (localStorage.getItem("highscore") === null) {
+      highscore = "0";
+    } else {
+      highscore = localStorage.getItem("highscore");
+    }
+    return highscore;
+  }
+
+  static setHighscore(score) {
+    localStorage.setItem("highscore", score);
+  }
+}
+
 const snake = new Snake();
 const fruit = new Fruit();
 const grid = new Grid();
@@ -138,6 +157,11 @@ function game() {
   snake.check();
 
   score.textContent = snake.total;
+  if (Storage.getHighscore() === "0") {
+    highscore.textContent = "0";
+  } else {
+    highscore.textContent = Storage.getHighscore();
+  }
 
   if (snake.eat(fruit)) {
     fruit.new();

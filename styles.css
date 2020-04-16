@@ -18,6 +18,12 @@ body {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
+.scores {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+}
+
 .footer {
   margin-top: 2rem;
   font-size: 1rem;
