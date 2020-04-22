@@ -2,6 +2,9 @@ const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 const highscore = document.querySelector(".highscore");
 const message = document.querySelector("#start");
+const modal = document.querySelector(".modal");
+const overlay = document.querySelector(".overlay");
+const nameForm = document.querySelector("#nameForm");
 
 const ctx = canvas.getContext("2d");
 
@@ -145,6 +148,8 @@ class Storage {
   }
 }
 
+// TODO: Create modal for user name
+
 const grid = new Grid();
 const fruit = new Fruit();
 const snake = new Snake();
@@ -183,12 +188,35 @@ let started = false;
 
 highscore.textContent = Storage.getHighscore();
 
+function getUsers(url) {
+  fetch(url)
+    .then((res) => res.json())
+    .then((users) => console.log(users));
+}
+
+getUsers("http://localhost:3905/users");
+
+nameForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = nameForm.name.value;
+  console.log(name);
+  overlay.style.display = "none";
+  modal.style.display = "none";
+});
 window.addEventListener("keydown", (e) => {
-  if (!started) {
-    message.textContent = "";
-    start();
-    started = true;
+  if (
+    e.keyCode == 37 ||
+    e.keyCode == 38 ||
+    e.keyCode == 39 ||
+    e.keyCode == 40
+  ) {
+    if (!started) {
+      message.textContent = "";
+      start();
+      started = true;
+    }
+
+    const direction = e.key.replace("Arrow", "").toLowerCase();
+    snake.steer(direction);
   }
-  const direction = e.key.replace("Arrow", "").toLowerCase();
-  snake.steer(direction);
 });
