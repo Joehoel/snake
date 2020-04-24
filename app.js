@@ -3,6 +3,65 @@ const score = document.querySelector(".score");
 const highscore = document.querySelector(".highscore");
 const message = document.querySelector("#start");
 
+const loginModal = document.querySelector("#login-modal");
+const loginForm = document.querySelector("#login-form");
+const registerModal = document.querySelector("#register-modal");
+const registerForm = document.querySelector("#register-form");
+const registerButton = document.querySelector("#register");
+
+registerButton.addEventListener("click", () => {
+  loginModal.style.display = "none";
+  registerModal.style.display = "block";
+});
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = loginForm.email.value;
+  const password = loginForm.password.value;
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, password);
+    closeModals();
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = registerForm.email.value;
+  const username = registerForm.username.value;
+  const password = registerForm.password.value;
+
+  try {
+    const result = await firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password);
+    await result.user.updateProfile({
+      displayName: username,
+    });
+    closeModals();
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+// const user = firebase.auth().currentUser;
+
+// if (user) {
+//   console.log(user.email);
+// } else {
+//   console.log("Nobody is logged in");
+// }
+
+function closeModals() {
+  const modals = document.querySelectorAll(".modal");
+  const overlay = document.querySelector(".overlay");
+  overlay.style.display = "none";
+  modals.forEach((modal) => {
+    modal.style.display = "none";
+  });
+}
+
 const ctx = canvas.getContext("2d");
 
 const size = 600;
