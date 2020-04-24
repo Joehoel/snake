@@ -2,9 +2,14 @@ const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 const highscore = document.querySelector(".highscore");
 const message = document.querySelector("#start");
-const modal = document.querySelector(".modal");
 const overlay = document.querySelector(".overlay");
 const nameForm = document.querySelector("#nameForm");
+const highscoreModal = document.querySelector("#highscore-modal");
+const highscoreButton = document.querySelector("#highscore-button");
+const highscoreList = document.querySelector("#highscore-list");
+const nameModal = document.querySelector("#name-modal");
+
+let name;
 
 const ctx = canvas.getContext("2d");
 
@@ -78,6 +83,20 @@ class Snake {
     for (let i = 0; i < this.tail.length; i++) {
       if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
         Storage.setHighscore(this.total);
+
+        const user = { name: name, highscore: this.total };
+        const raw = JSON.stringify(user);
+
+        fetch(`${BASE_URL}/users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: raw,
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data));
+
         this.total = 0;
         this.tail = [];
         clearInterval(loop);
@@ -188,21 +207,46 @@ let started = false;
 
 highscore.textContent = Storage.getHighscore();
 
-function getUsers(url) {
-  fetch(url)
-    .then((res) => res.json())
-    .then((users) => console.log(users));
+const BASE_URL =
+  "http://localhost:3905" || "https://pacific-wildwood-11143.herokuapp.com";
+
+async function getUsers(url) {
+  try {
+    const res = await fetch(`${url}/users`);
+    const users = await res.json();
+
+    return users.map((user) => {
+      return { name: user.name, highscore: user.highscore };
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-getUsers("http://localhost:3905/users");
-
-nameForm.addEventListener("submit", (e) => {
+nameForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = nameForm.name.value;
-  console.log(name);
-  overlay.style.display = "none";
-  modal.style.display = "none";
+  name = nameForm.name.value;
+
+  const res = await fetch(`${BASE_URL}/${name}`);
+  const data = await res.json();
+  if (!data.success) {
+    if (!name.trim() == "") {
+      overlay.style.display = "none";
+      nameModal.style.display = "none";
+    }
+  }
 });
+
+highscoreButton.addEventListener("click", async () => {
+  highscoreModal.style.display = "block";
+  overlay.style.display = "block";
+  const users = await getUsers(BASE_URL);
+  users.sort((a, b) => a.highscore - b.highscore).reverse();
+  for (const user of users) {
+    highscoreList.innerHTML += `<li>${user.name} - ${user.highscore}</li>`;
+  }
+});
+
 window.addEventListener("keydown", (e) => {
   if (
     e.keyCode == 37 ||

@@ -4,6 +4,14 @@
   box-sizing: border-box;
 }
 
+#start {
+  margin-top: 1rem;
+}
+
+canvas {
+  margin: 1rem;
+}
+
 a,
 a:visited {
   color: black;
@@ -79,4 +87,24 @@ canvas {
 
 .form-group button {
   margin-top: 5px;
+}
+
+button {
+  background-color: #4cafab;
+  border: 1px solid rgb(59, 138, 135);
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+#highscore-modal {
+  width: 300px;
+}
+
+#highscore-list {
+  margin: 1rem;
 }

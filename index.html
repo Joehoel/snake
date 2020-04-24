@@ -12,12 +12,25 @@
   </head>
   <body>
     <div class="overlay"></div>
-    <div class="modal">
+    <div class="modal" id="highscore-modal" style="display: none;">
+      <button style="float: right;">&times;</button>
+      <h2>Highscores</h2>
+      <ol id="highscore-list"></ol>
+    </div>
+    <div class="modal" id="name-modal">
       <form id="nameForm">
         <div class="form-group">
           <label for="name">Name</label>
-          <input type="text" name="name" placeholder="Enter name here..." />
-          <button type="submit">Submit</button>
+          <input
+            autocomplete="off"
+            autofocus
+            type="text"
+            name="name"
+            placeholder="Enter name here..."
+          />
+          <button type="submit">
+            Submit
+          </button>
         </div>
       </form>
     </div>
@@ -27,6 +40,8 @@
     </div>
     <h3 id="start">Press any key to start...</h3>
     <canvas></canvas>
+
+    <button id="highscore-button">View all highscores</button>
 
     <div class="footer">
       <span>
