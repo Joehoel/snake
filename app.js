@@ -2,12 +2,28 @@ const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
 const highscore = document.querySelector(".highscore");
 const message = document.querySelector("#start");
+const overlay = document.querySelector(".overlay");
 
 const loginModal = document.querySelector("#login-modal");
 const loginForm = document.querySelector("#login-form");
+
 const registerModal = document.querySelector("#register-modal");
 const registerForm = document.querySelector("#register-form");
 const registerButton = document.querySelector("#register");
+
+const highscoreModal = document.querySelector("#highscore-modal");
+const highscoreButton = document.querySelector("#highscore-button");
+const highscoreList = document.querySelector("#highscore-list");
+
+highscoreButton.addEventListener("click", async () => {
+  highscoreModal.style.display = "block";
+  overlay.style.display = "block";
+  const users = getUsers();
+  // users.sort((a, b) => a.highscore - b.highscore).reverse();
+  for (const user of users) {
+    highscoreList.innerHTML += `<li>${user.name} - ${user.highscore}</li>`;
+  }
+});
 
 registerButton.addEventListener("click", () => {
   loginModal.style.display = "none";
@@ -72,6 +88,14 @@ firebase.auth().onAuthStateChanged(async (user) => {
     openModal();
   }
 });
+
+async function getUsers() {
+  const docRefs = await db.collection("users").get();
+  const users = await docRefs.forEach((docRef) => {
+    return docRef.data();
+  });
+  console.log(users);
+}
 
 async function getHighscore(uid) {
   const docRef = await db.collection("users").doc(uid).get();
