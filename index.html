@@ -8,16 +8,30 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/7.14.1/firebase-firestore.js"
+    ></script>
+    <script defer src="firebase.js"></script>
+    <script defer src="app.js"></script>
     <title>Snake</title>
   </head>
   <body>
-    <div class="overlay"></div>
+    <div class="overlay" style="display: none;"></div>
     <div class="modal" id="highscore-modal" style="display: none;">
       <button style="float: right;">&times;</button>
       <h2>Highscores</h2>
       <ol id="highscore-list"></ol>
     </div>
-    <div class="modal" id="login-modal">
+    <div class="modal" id="login-modal" style="display: none;">
       <form id="login-form">
         <h2>Login</h2>
         <div class="form-group">
@@ -107,15 +121,5 @@
         ></a>
       </div>
     </div>
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"
-    ></script>
-    <script defer src="firebase.js"></script>
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"
-    ></script>
-    <script defer src="app.js"></script>
   </body>
 </html>

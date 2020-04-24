@@ -20,7 +20,7 @@ loginForm.addEventListener("submit", async (e) => {
   const password = loginForm.password.value;
   try {
     await firebase.auth().signInWithEmailAndPassword(email, password);
-    closeModals();
+    // closeModals();
   } catch (e) {
     console.error(e);
   }
@@ -33,25 +33,74 @@ registerForm.addEventListener("submit", async (e) => {
   const password = registerForm.password.value;
 
   try {
-    const result = await firebase
+    const userAuth = await firebase
       .auth()
       .createUserWithEmailAndPassword(email, password);
-    await result.user.updateProfile({
+
+    await userAuth.user.updateProfile({
       displayName: username,
     });
+    const user = {
+      username,
+      highscore: 0,
+      createdAt: Date.now(),
+      uid: userAuth.user.uid,
+      email: userAuth.user.email,
+    };
+
+    writeUserData(user);
+
     closeModals();
   } catch (e) {
-    console.error(e);
+    console.error(e.message);
+  }
+});
+const db = firebase.firestore();
+
+let currentUser;
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  currentUser = user;
+  if (currentUser) {
+    closeModals();
+    setTimeout(() => {
+      console.log(currentUser.displayName, "logged in");
+    }, 1000);
+    highscore.textContent =
+      Storage.getHighscore() || (await getHighscore(currentUser.uid));
+  } else {
+    openModal();
   }
 });
 
-// const user = firebase.auth().currentUser;
+async function getHighscore(uid) {
+  const docRef = await db.collection("users").doc(uid).get();
+  const highscore = await docRef.data().highscore;
+  return highscore;
+}
 
-// if (user) {
-//   console.log(user.email);
-// } else {
-//   console.log("Nobody is logged in");
-// }
+function writeUserData(user) {
+  db.collection("users")
+    .doc(user.uid)
+    .set(user)
+    .catch((error) => {
+      console.log(error.message);
+    });
+}
+
+async function updateHighscore(uid) {
+  db.collection("users").doc(uid).update({
+    highscore: Storage.getHighscore(),
+  });
+  highscore.textContent = Storage.getHighscore();
+}
+
+function openModal() {
+  const overlay = document.querySelector(".overlay");
+  overlay.style.display = "block";
+
+  loginModal.style.display = "block";
+}
 
 function closeModals() {
   const modals = document.querySelectorAll(".modal");
@@ -134,6 +183,7 @@ class Snake {
     for (let i = 0; i < this.tail.length; i++) {
       if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
         Storage.setHighscore(this.total);
+        updateHighscore(currentUser.uid);
         this.total = 0;
         this.tail = [];
         clearInterval(loop);
@@ -190,7 +240,7 @@ class Storage {
     let highscore;
 
     if (localStorage.getItem("highscore") === null) {
-      highscore = "0";
+      highscore = 0;
     } else {
       highscore = localStorage.getItem("highscore");
     }
@@ -227,11 +277,6 @@ function game() {
   snake.check();
 
   score.textContent = snake.total;
-  if (Storage.getHighscore() === "0") {
-    highscore.textContent = "0";
-  } else {
-    highscore.textContent = Storage.getHighscore();
-  }
 
   if (snake.eat(fruit)) {
     fruit.new();
@@ -239,8 +284,6 @@ function game() {
 }
 
 let started = false;
-
-highscore.textContent = Storage.getHighscore();
 
 window.addEventListener("keydown", (e) => {
   if (!started) {
