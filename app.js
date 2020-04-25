@@ -1,8 +1,9 @@
 const canvas = document.querySelector("canvas");
 const score = document.querySelector(".score");
-const highscore = document.querySelector(".highscore");
+const highscoreEl = document.querySelector(".highscore");
 const message = document.querySelector("#start");
 const overlay = document.querySelector(".overlay");
+const deleteBtn = document.querySelector(".delete");
 
 const loginModal = document.querySelector("#login-modal");
 const loginForm = document.querySelector("#login-form");
@@ -15,13 +16,15 @@ const highscoreModal = document.querySelector("#highscore-modal");
 const highscoreButton = document.querySelector("#highscore-button");
 const highscoreList = document.querySelector("#highscore-list");
 
+deleteBtn.addEventListener("click", closeModals);
+
 highscoreButton.addEventListener("click", async () => {
   highscoreModal.style.display = "block";
   overlay.style.display = "block";
-  const users = getUsers();
-  // users.sort((a, b) => a.highscore - b.highscore).reverse();
+  const users = await getUsers();
+  users.sort((a, b) => b.highscore - a.highscore);
   for (const user of users) {
-    highscoreList.innerHTML += `<li>${user.name} - ${user.highscore}</li>`;
+    highscoreList.innerHTML += `<li>${user.username} - ${user.highscore}</li>`;
   }
 });
 
@@ -82,19 +85,17 @@ firebase.auth().onAuthStateChanged(async (user) => {
     setTimeout(() => {
       console.log(currentUser.displayName, "logged in");
     }, 1000);
-    highscore.textContent =
-      Storage.getHighscore() || (await getHighscore(currentUser.uid));
+    highscoreEl.textContent = await getHighscore(currentUser.uid);
   } else {
     openModal();
   }
 });
 
 async function getUsers() {
-  const docRefs = await db.collection("users").get();
-  const users = await docRefs.forEach((docRef) => {
-    return docRef.data();
-  });
+  const snapshot = await firebase.firestore().collection("users").get();
+  const users = snapshot.docs.map((doc) => doc.data());
   console.log(users);
+  return users;
 }
 
 async function getHighscore(uid) {
@@ -112,11 +113,14 @@ function writeUserData(user) {
     });
 }
 
-async function updateHighscore(uid) {
-  db.collection("users").doc(uid).update({
-    highscore: Storage.getHighscore(),
-  });
-  highscore.textContent = Storage.getHighscore();
+async function updateHighscore(uid, highscore) {
+  if (highscore >= (await getHighscore(uid))) {
+    console.log("Updating highscore to: ", highscore);
+    db.collection("users").doc(uid).update({
+      highscore,
+    });
+    highscoreEl.textContent = highscore;
+  }
 }
 
 function openModal() {
@@ -129,6 +133,7 @@ function openModal() {
 function closeModals() {
   const modals = document.querySelectorAll(".modal");
   const overlay = document.querySelector(".overlay");
+  highscoreList.innerHTML = "";
   overlay.style.display = "none";
   modals.forEach((modal) => {
     modal.style.display = "none";
@@ -176,11 +181,19 @@ function game() {
 let started = false;
 
 window.addEventListener("keydown", (e) => {
-  if (!started) {
-    message.textContent = "";
-    start();
-    started = true;
+  if (
+    e.keyCode == 37 ||
+    e.keyCode == 38 ||
+    e.keyCode == 39 ||
+    e.keyCode == 40
+  ) {
+    if (!started) {
+      message.textContent = "";
+      start();
+      started = true;
+    }
+
+    const direction = e.key.replace("Arrow", "").toLowerCase();
+    snake.steer(direction);
   }
-  const direction = e.key.replace("Arrow", "").toLowerCase();
-  snake.steer(direction);
 });

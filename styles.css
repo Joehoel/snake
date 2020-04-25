@@ -75,6 +75,19 @@ canvas {
   margin-top: 5px;
 }
 
+.delete {
+  background-color: #4cafab;
+  border: 1px solid rgb(59, 138, 135);
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+
 button {
   background-color: #4cafab;
   border: 1px solid rgb(59, 138, 135);
@@ -102,7 +115,7 @@ button {
   text-decoration: none;
 }
 
-.modal button {
+.modal button[type="submit"] {
   width: 100%;
 }
 
@@ -114,6 +127,10 @@ button {
 
 #highscore-list {
   margin: 1rem;
+}
+
+#highscore-button {
+  margin-top: 1rem;
 }
 
 .modal h2 {

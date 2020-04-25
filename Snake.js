@@ -51,8 +51,8 @@ class Snake {
   check() {
     for (let i = 0; i < this.tail.length; i++) {
       if (this.x == this.tail[i].x && this.y == this.tail[i].y) {
-        Storage.setHighscore(this.total);
-        updateHighscore(currentUser.uid);
+        // Storage.setHighscore(this.total);
+        updateHighscore(currentUser.uid, this.total);
         this.total = 0;
         this.tail = [];
         clearInterval(loop);
