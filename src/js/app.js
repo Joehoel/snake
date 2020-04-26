@@ -16,69 +16,11 @@ const highscoreModal = document.querySelector("#highscore-modal");
 const highscoreButton = document.querySelector("#highscore-button");
 const highscoreList = document.querySelector("#highscore-list");
 
-deleteBtn.addEventListener("click", closeModals);
-
-highscoreButton.addEventListener("click", async () => {
-  highscoreModal.style.display = "block";
-  overlay.style.display = "block";
-  const users = await getUsers();
-  users.sort((a, b) => b.highscore - a.highscore);
-  for (const user of users) {
-    highscoreList.innerHTML += `<li>${user.username} - ${user.highscore}</li>`;
-  }
-});
-
-registerButton.addEventListener("click", () => {
-  loginModal.style.display = "none";
-  registerModal.style.display = "block";
-});
-
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = loginForm.email.value;
-  const password = loginForm.password.value;
-  try {
-    await firebase.auth().signInWithEmailAndPassword(email, password);
-    // closeModals();
-  } catch (e) {
-    console.error(e);
-  }
-});
-
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = registerForm.email.value;
-  const username = registerForm.username.value;
-  const password = registerForm.password.value;
-
-  try {
-    const userAuth = await firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password);
-
-    await userAuth.user.updateProfile({
-      displayName: username,
-    });
-    const user = {
-      username,
-      highscore: 0,
-      createdAt: Date.now(),
-      uid: userAuth.user.uid,
-      email: userAuth.user.email,
-    };
-
-    writeUserData(user);
-
-    closeModals();
-  } catch (e) {
-    console.error(e.message);
-  }
-});
 const db = firebase.firestore();
 
 let currentUser;
 
-firebase.auth().onAuthStateChanged(async (user) => {
+firebase.auth().onAuthStateChanged(async user => {
   currentUser = user;
   if (currentUser) {
     closeModals();
@@ -93,8 +35,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
 
 async function getUsers() {
   const snapshot = await firebase.firestore().collection("users").get();
-  const users = snapshot.docs.map((doc) => doc.data());
-  console.log(users);
+  const users = snapshot.docs.map(doc => doc.data());
   return users;
 }
 
@@ -104,13 +45,19 @@ async function getHighscore(uid) {
   return highscore;
 }
 
-function writeUserData(user) {
-  db.collection("users")
-    .doc(user.uid)
-    .set(user)
-    .catch((error) => {
-      console.log(error.message);
-    });
+async function writeUserData(user) {
+  try {
+    const userRef = await db.collection("users").doc(user.uid);
+    await userRef.set(user);
+  } catch (error) {
+    console.error(error);
+  }
+  // db.collection("users")
+  //   .doc(user.uid)
+  //   .set(user)
+  //   .catch(error => {
+  //     console.log(error.message);
+  //   });
 }
 
 async function updateHighscore(uid, highscore) {
@@ -135,7 +82,7 @@ function closeModals() {
   const overlay = document.querySelector(".overlay");
   highscoreList.innerHTML = "";
   overlay.style.display = "none";
-  modals.forEach((modal) => {
+  modals.forEach(modal => {
     modal.style.display = "none";
   });
 }
@@ -180,7 +127,7 @@ function game() {
 
 let started = false;
 
-window.addEventListener("keydown", (e) => {
+window.addEventListener("keydown", e => {
   if (
     e.keyCode == 37 ||
     e.keyCode == 38 ||
@@ -195,5 +142,64 @@ window.addEventListener("keydown", (e) => {
 
     const direction = e.key.replace("Arrow", "").toLowerCase();
     snake.steer(direction);
+  }
+});
+
+deleteBtn.addEventListener("click", closeModals);
+
+highscoreButton.addEventListener("click", async () => {
+  highscoreModal.style.display = "block";
+  overlay.style.display = "block";
+  const users = await getUsers();
+  users.sort((a, b) => b.highscore - a.highscore);
+  for (const user of users) {
+    highscoreList.innerHTML += `<li>${user.username} - ${user.highscore}</li>`;
+  }
+});
+
+registerButton.addEventListener("click", () => {
+  loginModal.style.display = "none";
+  registerModal.style.display = "block";
+});
+
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = loginForm.email.value;
+  const password = loginForm.password.value;
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, password);
+    // closeModals();
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+registerForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = registerForm.email.value;
+  const username = registerForm.username.value;
+  const password = registerForm.password.value;
+
+  try {
+    const userAuth = await firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password);
+
+    await userAuth.user.updateProfile({
+      displayName: username,
+    });
+    const user = {
+      username,
+      highscore: 0,
+      createdAt: Date.now(),
+      uid: userAuth.user.uid,
+      email: userAuth.user.email,
+    };
+
+    writeUserData(user);
+
+    closeModals();
+  } catch (e) {
+    console.error(e.message);
   }
 });
