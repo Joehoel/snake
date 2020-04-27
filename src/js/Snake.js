@@ -8,6 +8,8 @@ class Snake {
 
     this.total = 0;
     this.tail = [];
+
+    this._direction;
   }
 
   draw() {
@@ -65,22 +67,29 @@ class Snake {
   steer(direction) {
     switch (direction) {
       case "up":
-        this.xs = 0;
-        this.ys = -scale;
+        if (this.ys !== scale) {
+          this.xs = 0;
+          this.ys = -scale;
+        }
         break;
       case "right":
-        this.xs = scale;
-        this.ys = 0;
+        if (this.xs !== -scale) {
+          this.xs = scale;
+          this.ys = 0;
+        }
         break;
       case "down":
-        this.xs = 0;
-        this.ys = scale;
+        if (this.ys !== -scale) {
+          this.xs = 0;
+          this.ys = scale;
+        }
         break;
       case "left":
-        this.xs = -scale;
-        this.ys = 0;
+        if (this.xs !== scale) {
+          this.xs = -scale;
+          this.ys = 0;
+        }
         break;
-
       default:
         break;
     }
