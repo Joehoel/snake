@@ -1,3 +1,4 @@
+// Obsolete class
 class Storage {
   static getHighscore() {
     let highscore;
