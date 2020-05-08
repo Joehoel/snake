@@ -52,12 +52,6 @@ async function writeUserData(user) {
   } catch (error) {
     console.error(error);
   }
-  // db.collection("users")
-  //   .doc(user.uid)
-  //   .set(user)
-  //   .catch(error => {
-  //     console.log(error.message);
-  //   });
 }
 
 async function updateHighscore(uid, highscore) {
